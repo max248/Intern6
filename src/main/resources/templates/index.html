@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Itransition - Task 6</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="icon" type="image/png" th:href="@{/img/itransition.jpg}">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a href="#" class="navbar-brand">
+        <img th:src="@{/img/itransition.jpg}" width="40" height="40" alt="" style="padding-right: 3px" class="d-inline-block align-top" />Itransition</a>
+    <button type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+</nav>
+<div class="container-fluid">
+    <div class="row">
+        <div class="w-100 px-2">
+            <div class="h1 mt-5 text-center">Fake User Data Generator</div>
+            <div class="container">
+                <div class="card-body d-flex flex-column">
+                    <form th:action="@{/}" method="post">
+                        <div class="row form-group  align-items-end">
+                            <div class="col-md-2">
+                                <select onchange="setChangedCountry(this.value)" class="custom-select" name="country"
+                                        id="country">
+                                    <option value="">Select country</option>
+                                    <option value="en">USA</option>
+                                    <option value="ru">Russia</option>
+                                    <option value="fr">France</option>
+                                    <option value="uk">Ukraine</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input id="range" type="range" class="custom-range" name="rangeInput" value="0" min="0" max="10"
+                                       step="0.5"
+                                       onchange="changeRangeErrorValue(this.value);">
+                            </div>
+                            <div class="col-md-2">
+                                <input onkeyup="customInputRange(this.value)" id="inputRange" placeholder="Error per record"
+                                       type="number"
+                                       class="form-control"
+                                       name="error" th:value="${error}" max="1000" min="0">
+                            </div>
+                            <div class="col-md-1">
+                                <input id="seedValue" onkeyup="changeSeedValue(this.value)" type="text"
+                                       class="form-control typeahead" name="seed" placeholder="Seed"
+                                       data-provide="typeahead" th:value="${seed}" style="-webkit-appearance: none; margin: 0">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="mt-auto btn btn-success" onclick="generateRandom()">
+                                    <i class="fa-solid fa-arrows-spin"></i> Random
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="button" class="btn btn-secondary" id="download_csv">
+                                    <i class="fa fa-download" aria-hidden="true"></i> Export to CSV
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="fakeDataTable" style="overflow: auto; height: 500px">
+
+                    <table class="table table-striped table-bordered" id="myTable">
+                        <thead class="thead-dark" style="position: sticky; top: 0;">
+                        <tr>
+                            <th scope="col">Fake Id</th>
+                            <th scope="col">Id</th>
+                            <th scope="col">Full Name</th>
+                            <th scope="col">Address</th>
+                            <th scope="col">Phone Number</th>
+                        </tr>
+                        </thead>
+                        <tbody id="bodyTable">
+                        <tr th:each="user : ${users}">
+                            <th scope="row" th:text="${user.sequenceNumber}"></th>
+                            <td th:text="${user.id}"></td>
+                            <td th:text="${user.fullName}"></td>
+                            <td th:text="${user.fullAddress}"></td>
+                            <td th:text="${user.phoneNumber}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+
+    function setChangedCountry(val) {
+        getGeneratedFakeData();
+    }
+
+    function changeSeedValue(val) {
+        getGeneratedFakeData();
+    }
+
+    function customInputRange(val) {
+        if(val>1000){
+            alert("Custom range value must be less than 1000 !!!");
+            return;
+        }
+        getGeneratedFakeData();
+    }
+
+    setErrorSlider();
+
+    function setErrorSlider() {
+
+        let range = document.getElementById("range");
+        let inputRange = document.getElementById("inputRange");
+        range.addEventListener('input', function () {
+            inputRange.value = this.value;
+        });
+        inputRange.addEventListener('input', function () {
+            range.value = this.value;
+            if (this.value === '') range.value = 0;
+        });
+
+    }
+
+    function changeRangeErrorValue(val) {
+        getGeneratedFakeData();
+    }
+
+    function generateRandom(maxLimit = 1000) {
+        let rand = Math.random() * maxLimit;
+        rand = Math.floor(rand);
+        document.getElementById('seedValue').value = rand;
+        getGeneratedFakeData();
+    }
+
+    function getGeneratedFakeData() {
+        $('.fakeDataTable').animate({scrollTop: 0},0);
+        var countryVal = document.getElementById("country").value;
+        var errorVal = document.getElementById("inputRange").value;
+        var seedVal = document.getElementById("seedValue").value;
+
+        fetch('/generateFakeData?' + new URLSearchParams({
+            country: countryVal,
+            errorCount: errorVal,
+            seed: seedVal
+        })).then(function (response) {
+            if (response.ok) {
+                response.json().then(res => {
+                    $("#bodyTable").empty();
+                    res.map(user => {
+                        appendUser(user);
+                    })
+                })
+            }
+        });
+    }
+
+    jQuery(function ($) {
+        $('.fakeDataTable').on('scroll', function () {
+            if ($(this).scrollTop() +
+                $(this).innerHeight() >=
+                $(this)[0].scrollHeight) {
+                get10FakeData();
+            }
+        });
+    });
+
+    function get10FakeData() {
+        var countryVal = document.getElementById("country").value;
+        var seedVal = document.getElementById("seedValue").value;
+        var errorVal = document.getElementById("inputRange").value;
+        var usersLength = $('#myTable tr').length;
+
+        fetch('/generateFakeData?' + new URLSearchParams({
+            dataLength: usersLength,
+            country: countryVal,
+            errorCount: errorVal,
+            seed: seedVal
+        })).then(function (response) {
+            if (response.ok) {
+                response.json().then(res => {
+                    res.map(user => {
+                        appendUser(user);
+                    })
+                })
+            }
+        });
+
+    }
+
+    function appendUser(user) {
+        $("#bodyTable").append(
+            "<tr>" +
+            "<th scope='row'>" + user.fakeId + "</th>" +
+            "<td>" + user.id + "</td>" +
+            "<td>" + user.fullName + "</td>" +
+            "<td>" + user.address + "</td>" +
+            "<td>" + user.phoneNumber + "</td>" +
+            "</tr>"
+        )
+
+    }
+
+    document.getElementById("download_csv").addEventListener("click", function () {
+        tableToCSV();
+    });
+
+    function tableToCSV() {
+        var csv_data = [];
+        var rows = document.getElementsByTagName('tr');
+        for (var i = 0; i < rows.length; i++) {
+            var cols = rows[i].querySelectorAll('td,th');
+            var csvrow = [];
+            for (var j = 0; j < cols.length; j++) {
+                csvrow.push(cols[j].innerHTML);
+            }
+            csv_data.push(csvrow.join(","));
+        }
+        csv_data = csv_data.join('\n');
+        downloadCSVFile(csv_data);
+    }
+
+    function downloadCSVFile(csv_data) {
+        CSVFile = new Blob([csv_data], {
+            type: "text/csv"
+        });
+
+        var temp_link = document.createElement('a');
+        temp_link.download = "data.csv";
+        var url = window.URL.createObjectURL(CSVFile);
+        temp_link.href = url;
+
+        temp_link.style.display = "none";
+        document.body.appendChild(temp_link);
+
+        temp_link.click();
+        document.body.removeChild(temp_link);
+    }
+
+</script>
