@@ -9,12 +9,8 @@ import java.util.List;
 
 @Controller
 public class MainController {
-
-
     @GetMapping("/")
     public String viewHomePage(){
         return "index";
     }
-
-
 }
