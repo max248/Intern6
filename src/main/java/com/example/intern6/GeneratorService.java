@@ -52,6 +52,7 @@ public class GeneratorService {
         Users user = new Users();
         for (int i = 1; i < lengthOfData + 10; i++) {
             if (i >= lengthOfData) {
+                user = new Users();
                 user.setFakeId((long) faker.number().numberBetween(100,999999));
                 user.setFullName(faker.name().fullName());
                 user.setAddress(generateAddress(locale, faker));
