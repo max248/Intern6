@@ -31,7 +31,6 @@ public class GeneratorService {
         }
         if (error > 0)
             generateDataWithError(users, error, seed, country);
-
         return users;
     }
 
