@@ -105,9 +105,7 @@ public class GeneratorService {
                         break;
                 }
             }
-
         }
-
     }
 
     private String addSymbols(String data, boolean isNumber, boolean isCyrillic, Random random) {
@@ -121,12 +119,18 @@ public class GeneratorService {
     }
 
     private String addErrorsToData(String data, boolean isNumber, int index, String characters, Random random) {
-        if (index == data.length() - 1) return isNumber ? data.concat(String.valueOf(random.nextInt(10))) :
-                data.concat(String.valueOf(characters.charAt(random.nextInt(52))));
-        return isNumber ?
-                data.substring(0, index).concat(String.valueOf(random.nextInt(10)).concat(data.substring(index + 1))) :
-                data.substring(0, index).concat(String.valueOf(characters.charAt(random.nextInt(52)))) +
-                        data.substring(index + 1);
+        if (index == data.length() - 1){
+            if(isNumber){
+                return data.concat(String.valueOf(random.nextInt(10)));
+            } else {
+                return data.concat(String.valueOf(characters.charAt(random.nextInt(52))));
+            }
+        }
+        if(isNumber){
+            return data.substring(0, index).concat(String.valueOf(random.nextInt(10)).concat(data.substring(index + 1)));
+        } else {
+            return  data.substring(0, index).concat(String.valueOf(characters.charAt(random.nextInt(52)))) + data.substring(index + 1);
+        }
     }
 
     private String deleteSymbols(String data, Random random) {
